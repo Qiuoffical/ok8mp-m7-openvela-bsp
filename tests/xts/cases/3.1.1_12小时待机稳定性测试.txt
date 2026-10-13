@@ -1,0 +1,68 @@
+openvela OK8MP Cortex-M7 XTS测试记录
+================================================================
+官方编号：3.1.1
+测试名称：12小时待机稳定性测试
+当前状态：已有长时间日志；需按官方条件重测或申请偏差
+结果摘要：已有长时间运行记录，但当前日志出现NTP_daemon，且补测配置未启用KASAN/show_info
+
+一、使用镜像
+- 镜像名称：xts-remaining
+  文件路径：tests/xts/firmware/xts/xts-remaining/nuttx.bin
+  文件大小：410928 bytes
+  SHA-256：26976a902227fc054982c991395fe024d6a1d696ea8cb83f5e24ecd12306476c
+  用途说明：mm、MD5、RAM块设备、UART、YMODEM、Reboot及稳定性补充测试镜像
+
+二、复现命令
+- 测试起点记录date -u、uname -a、free、ps；之后定期重复；12小时后记录结束状态
+
+三、需要随源码提交或随测试归档的其他文件
+- 本文件所收录的串口测试记录。
+
+四、原始证据来源
+- 开发期间保存的串口记录，见下方原始测试记录。
+
+五、原始测试记录
+nsh> date
+Sat, Jul 25 16:09:08 2026
+nsh> 
+nsh> date
+Sat, Jul 25 16:11:22 2026
+nsh> 
+nsh> date -u
+Sun, Jul 25 22:22:41 2026
+nsh> 
+nsh> date -u
+Sun, Jul 26 04:13:35 2026
+nsh> date -u
+Sun, Jul 26 08:45:29 2026
+nsh> free
+      total       used       free    maxused    maxfree  nused  nfree name
+   15672800     390824   15281976   11846464   11195792    936     43 Umem
+nsh> ps
+  TID   PID  PPID PRI POLICY   TYPE    NPX STATE    EVENT     SIGMASK            STACK COMMAND
+    0     0     0   0 FIFO     Kthread   - Ready              0000000000000000 0000984 Idle_Task
+    1     0     0 224 RR       Kthread   - Waiting  Semaphore 0000000000000000 0001960 hpwork 0x801001c0 0x80100210
+    2     0     0 100 RR       Kthread   - Waiting  Semaphore 0000000000000000 0001960 lpwork 0x80100150 0x801001a0
+    4     4     0 100 RR       Task      - Waiting  Signal    0000000000000000 0003008 fec_poll
+    5     5     0 100 RR       Task      - Running            0000000000000000 0001984 nsh_main
+    6     6     5 100 RR       Task      - Waiting  Signal    0000000000000000 0001936 NTP_daemon 0.pool.ntp.org;1.pool.ntp.org;2.pool.ntp.org
+nsh> uname -a
+NuttX  0.0.0 28d9404669-dirty Jul 26 2026 15:16:24 arm ok8mp-m7
+nsh> 
+nsh> date -u
+Sun, Jul 26 12:18:52 2026
+nsh> uname -a
+NuttX  0.0.0 28d9404669-dirty Jul 26 2026 18:7
+nsh> 
+nsh> free
+      total       used       free    maxused e
+   15670840      19312   15651528      19680 m
+nsh> ps
+  TID   PID  PPID PRI POLICY   TYPE    NPX STD
+    0     0     0   0 FIFO     Kthread   - Rek
+    1     0     0 224 RR       Kthread   - Wa0
+    2     0     0 100 RR       Kthread   - Wa0
+    4     4     0 100 RR       Task      - Wal
+    5     5     0 100 RR       Task      - Run
+    6     6     5 100 RR       Task      - Wag
+nsh> 
